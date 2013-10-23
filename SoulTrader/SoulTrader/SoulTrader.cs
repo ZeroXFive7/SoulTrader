@@ -14,19 +14,31 @@ namespace SoulTrader
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class SoulTrader : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        List<GameObject> gameObjectCollection = new List<GameObject>();
-        Camera mainCamera;
-        Player player;
+        SceneEditor editor = null;
 
-        public Game1()
+        Scene scene = null;
+        Camera mainCamera = null;
+        Player player = null;
+
+        public SoulTrader()
         {
+            this.Window.AllowUserResizing = true;
+            this.Window.ClientSizeChanged += ResizedWindow;
+
+            Mouse.WindowHandle = Window.Handle;
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+//#if (EDITOR)
+            editor = new SceneEditor();
+            this.IsMouseVisible = true;
+//#endif
         }
 
         /// <summary>
@@ -38,14 +50,15 @@ namespace SoulTrader
         protected override void Initialize()
         {
             mainCamera = new Camera(GraphicsDevice.Viewport);
+            scene = new Scene(mainCamera);
+            scene.Load("default.lvl");
 
-            player = new Player(mainCamera, "red", new Vector2(75.0f, 75.0f), new Vector2(50.0f, 50.0f));
-            gameObjectCollection.Add(player);
+            if (editor != null)
+            {
+                editor.AddNewScene(scene);
+            }
 
-            gameObjectCollection.Add(new Obstacle("green", new Vector2(0.0f, 0.0f), new Vector2(1000.0f, 50.0f)));
-            gameObjectCollection.Add(new Obstacle("green", new Vector2(200.0f, 50.0f), new Vector2(50.0f, 100.0f)));
-
-            gameObjectCollection.Add(new KillZone("green", new Vector2(-5000.0f, -200.0f), new Vector2(10000.0f, 100.0f)));
+            player = scene.Player;
 
             base.Initialize();
         }
@@ -60,12 +73,7 @@ namespace SoulTrader
 
             GraphicsSystem.Initialize(spriteBatch, Content);
             PhysicsSystem.Initialize();
-
-            foreach (GameObject obj in gameObjectCollection)
-            {
-                GraphicsSystem.RegisterGraphicsObject(obj.GraphicsObject);
-                PhysicsSystem.RegisterPhysicsObject(obj.PhysicsObject);
-            }
+            scene.Initialize();
 
             GraphicsSystem.RegisterSpriteByName("dollar");
         }
@@ -87,15 +95,18 @@ namespace SoulTrader
         protected override void Update(GameTime gameTime)
         {
             if (player.Money <= 0 || Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-
-            GraphicsSystem.Update(mainCamera.ViewTransform);
-
-            foreach (GameObject obj in gameObjectCollection)
             {
-                obj.Update(gameTime.ElapsedGameTime);
+                //scene.Save("default.lvl");
+                this.Exit();
             }
 
+            if (editor != null)
+            {
+                editor.Update();
+            }
+
+            GraphicsSystem.Update(mainCamera.ViewTransform);
+            scene.Update(gameTime);
             PhysicsSystem.Update();
 
             base.Update(gameTime);
@@ -109,10 +120,7 @@ namespace SoulTrader
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            foreach (GameObject obj in gameObjectCollection)
-            {
-                obj.Render();
-            }
+            scene.Render();
 
             GraphicsSystem.RenderGraphicsObjects();
             
@@ -124,6 +132,22 @@ namespace SoulTrader
             GraphicsSystem.RenderString(player.Money.ToString(), new Vector2(offset + width, 2 * offset));
 
             base.Draw(gameTime);
+        }
+
+        protected void ResizedWindow(object sender, EventArgs e)
+        {
+            var safeWidth = Math.Max(this.Window.ClientBounds.Width, 1);
+            var safeHeight = Math.Max(this.Window.ClientBounds.Height, 1);
+            var newViewport = new Viewport(0, 0, safeWidth, safeHeight) { MinDepth = 0.0f, MaxDepth = 1.0f };
+
+            var presentationParams = GraphicsDevice.PresentationParameters;
+            presentationParams.BackBufferWidth = safeWidth;
+            presentationParams.BackBufferHeight = safeHeight;
+            presentationParams.DeviceWindowHandle = this.Window.Handle;
+            GraphicsDevice.Reset(presentationParams);
+
+            GraphicsDevice.Viewport = newViewport;
+            mainCamera.Viewport = newViewport;
         }
     }
 }

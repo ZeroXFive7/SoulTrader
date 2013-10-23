@@ -10,7 +10,7 @@ namespace SoulTrader
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (SoulTrader game = new SoulTrader())
             {
                 game.Run();
             }

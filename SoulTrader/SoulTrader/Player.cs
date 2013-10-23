@@ -18,8 +18,6 @@ namespace SoulTrader
         private float runSpeed = 75.0f;
         private float jumpHeight = 10.0f;
 
-        private bool jumped = false;
-
         public Player(Camera camera, string spriteName, Vector2 initialPosition, Vector2 size) 
             : base(spriteName, initialPosition, size)
         {
@@ -28,7 +26,7 @@ namespace SoulTrader
 
         public override void Update(TimeSpan timeSinceLastFrame)
         {
-            camera.Update(CenterPosition);
+            camera.Update(CenterPosition, timeSinceLastFrame);
 
             KeyboardState keyState = Keyboard.GetState();
             float horizontalMovement = (Convert.ToSingle(keyState.IsKeyDown(Keys.D)) - Convert.ToSingle(keyState.IsKeyDown(Keys.A))) * (float)timeSinceLastFrame.TotalSeconds * runSpeed;
