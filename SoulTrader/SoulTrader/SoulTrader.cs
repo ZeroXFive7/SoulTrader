@@ -51,7 +51,7 @@ namespace SoulTrader
         {
             mainCamera = new Camera(GraphicsDevice.Viewport);
             scene = new Scene(mainCamera);
-            scene.Load("default.lvl");
+            scene.Load("Content/Levels/default.lvl");
 
             if (editor != null)
             {
@@ -68,12 +68,17 @@ namespace SoulTrader
         /// all of your content.
         /// </summary>
         protected override void LoadContent()
-        {   
+        {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             GraphicsSystem.Initialize(spriteBatch, Content);
             PhysicsSystem.Initialize();
             scene.Initialize();
+
+            if (editor != null)
+            {
+                editor.Initialize(GraphicsDevice, spriteBatch);
+            }
 
             GraphicsSystem.RegisterSpriteByName("dollar");
         }
@@ -96,7 +101,7 @@ namespace SoulTrader
         {
             if (player.Money <= 0 || Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
             {
-                //scene.Save("default.lvl");
+                //scene.Save("../../../../SoulTraderContent/Levels/default.lvl");
                 this.Exit();
             }
 
@@ -123,7 +128,12 @@ namespace SoulTrader
             scene.Render();
 
             GraphicsSystem.RenderGraphicsObjects();
-            
+
+            if (editor != null)
+            {
+                editor.Render();
+            }
+
             Viewport viewport = GraphicsDevice.Viewport;
             int offset = viewport.Width / 100;
             int width = viewport.Width / 20;
