@@ -16,6 +16,7 @@ namespace SoulTrader
 
         private int deathPenalty = 400;
         private float runSpeed = 75.0f;
+        private float maxRunSpeed = 100.0f;
         private float jumpHeight = 10.0f;
 
         public Player(Camera camera, string spriteName, Vector2 initialPosition, Vector2 size) 
@@ -31,8 +32,9 @@ namespace SoulTrader
             KeyboardState keyState = Keyboard.GetState();
             float horizontalMovement = (Convert.ToSingle(keyState.IsKeyDown(Keys.D)) - Convert.ToSingle(keyState.IsKeyDown(Keys.A))) * (float)timeSinceLastFrame.TotalSeconds * runSpeed;
             velocity += new Vector2(horizontalMovement, 0.0f);
+            velocity.X = Math.Min(velocity.X, maxRunSpeed);
 
-            if (onGround && keyState.IsKeyDown(Keys.Space))
+            if (onGround && keyState.IsKeyDown(Keys.Space) && velocity.Y <= 0.0f)
             {
                 velocity += new Vector2(0.0f, jumpHeight);
                 onGround = false;

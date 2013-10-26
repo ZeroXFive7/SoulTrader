@@ -46,6 +46,8 @@ namespace SoulTrader
             {
                 obj.HandleCollisions();
             }
+
+            colliders.Clear();
         }
     }
 }

@@ -16,10 +16,13 @@ namespace SoulTrader
 
         #region forces
 
-        private Vector2 gravity = new Vector2(0.0f, -20.0f);
+        private Vector2 gravity = new Vector2(0.0f, -40.0f);
 
         protected Vector2 velocity = Vector2.Zero;
         protected bool onGround = false;
+
+        private float groundFriction = 10.0f;
+        private float airFriction = 8.5f;
 
         #endregion
 
@@ -37,14 +40,15 @@ namespace SoulTrader
 
         public override void Update(TimeSpan timeSinceLastFrame)
         {
+            float deltaSeconds = (float)timeSinceLastFrame.TotalSeconds;
             if (!onGround)
             {
-                velocity += gravity * (float)timeSinceLastFrame.TotalSeconds;
-                velocity.X *= 0.8f;
+                velocity += gravity * deltaSeconds;
+                velocity.X *= (1.0f - airFriction * deltaSeconds);
             }
             else
             {
-                velocity.X *= 0.9f;
+                velocity.X *= (1.0f - groundFriction * deltaSeconds);
             }
 
             onGround = false;
@@ -108,6 +112,7 @@ namespace SoulTrader
 
         protected virtual void Respawn()
         {
+            velocity = Vector2.Zero;
             UpdatePosition(spawnPoint);
         }
 
