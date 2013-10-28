@@ -39,8 +39,8 @@ namespace SoulTrader
 
             this.spawnPoint = initialPosition;
 
-            AddSoul(new GroundPoundSoul(this));
-            AddSoul(new DoubleJumpSoul(this));
+            //AddSoul(new GroundPoundSoul(this));
+            //AddSoul(new DoubleJumpSoul(this));
         }
 
         public override void Update(TimeSpan timeSinceLastFrame)
@@ -79,7 +79,7 @@ namespace SoulTrader
                 int thrownGold = 50;
                 money -= thrownGold;
                 float direction = velocity.X > 0.0f ? 1.0f : -1.0f;
-                ActiveScene.Scene.AddAndInitialize(new MoneyBall("gold", thrownGold, new Vector2(direction * 20.0f, 10.0f), this.CenterPosition, new Vector2(20.0f, 20.0f)));
+                ActiveScene.Scene.AddAndInitialize(new MoneyBall("gold", thrownGold, this, new Vector2(direction * 20.0f, 10.0f), this.CenterPosition, new Vector2(20.0f, 20.0f)));
             }
 
             base.Update(timeSinceLastFrame);
@@ -143,6 +143,7 @@ namespace SoulTrader
 
         public void AddSoul(Soul soul)
         {
+            soul.RegisterPlayer(this);
             portfolio.Add(soul);
         }
     }

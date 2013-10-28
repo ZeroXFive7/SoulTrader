@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using SoulTrader.Input_System;
 using SoulTrader.SceneSystem;
+using SoulTrader.Souls;
 
 namespace SoulTrader
 {
@@ -74,6 +75,9 @@ namespace SoulTrader
             {
                 ActiveScene.Editor.Initialize(GraphicsDevice, spriteBatch);
             }
+
+            ActiveScene.Scene.AddAndInitialize(new NPC("white", new DoubleJumpSoul(null), 200, new Vector2(500, 50), new Vector2(50, 50)));
+            ActiveScene.Scene.AddAndInitialize(new NPC("white", new GroundPoundSoul(null), 200, new Vector2(700, 50), new Vector2(50, 50)));
 
             GraphicsSystem.RegisterSpriteByName("dollar");
         }

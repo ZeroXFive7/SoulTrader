@@ -9,9 +9,13 @@ namespace SoulTrader.GameObjects.Actors
 {
     public class Projectile : Actor
     {
-        public Projectile(string spriteName, Vector2 initialVelocity, Vector2 initialPosition, Vector2 size)
+        public Player Parent { get { return parent; } }
+        private Player parent;
+
+        public Projectile(string spriteName, Player parent, Vector2 initialVelocity, Vector2 initialPosition, Vector2 size)
             : base(spriteName, initialPosition, size)
         {
+            this.parent = parent;
             velocity = initialVelocity;
         }
 

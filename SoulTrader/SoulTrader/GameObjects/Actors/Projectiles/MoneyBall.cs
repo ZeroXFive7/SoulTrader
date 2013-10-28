@@ -14,8 +14,8 @@ namespace SoulTrader.GameObjects.Actors.Projectiles
         public bool HasLeftPlayer = false;
         private bool collidedWithPlayer = false;
 
-        public MoneyBall(string spriteName, int value, Vector2 initialVelocity, Vector2 initialPosition, Vector2 size)
-            : base(spriteName, initialVelocity, initialPosition, size)
+        public MoneyBall(string spriteName, int value, Player parent, Vector2 initialVelocity, Vector2 initialPosition, Vector2 size)
+            : base(spriteName, parent, initialVelocity, initialPosition, size)
         {
             this.value = value;
         }

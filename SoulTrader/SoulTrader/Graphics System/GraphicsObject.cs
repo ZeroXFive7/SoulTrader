@@ -10,7 +10,7 @@ namespace SoulTrader
     {
         private GameObject parent;
 
-        public string TextureString { get { return this.texString; } }
+        public string TextureString { get { return this.texString; } set { this.texString = value; } }
         private string texString = "";
 
         public Vector2 WorldPosition { get { return this.worldPosition; } set { this.worldPosition = value; } }
