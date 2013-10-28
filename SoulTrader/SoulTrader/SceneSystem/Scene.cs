@@ -27,6 +27,9 @@ namespace SoulTrader
 
         protected List<GameObject> scene = new List<GameObject>();
 
+        private List<GameObject> insertionQueue = new List<GameObject>();
+        private List<GameObject> removalQueue = new List<GameObject>();
+
         public Scene(Camera camera)
         {
             this.camera = camera;
@@ -41,7 +44,18 @@ namespace SoulTrader
 
         public void Add(GameObject gameObject)
         {
-            scene.Add(gameObject);
+            insertionQueue.Add(gameObject);
+        }
+
+        public void RemoveAndUninitialize(GameObject gameObject)
+        {
+            Remove(gameObject);
+            PhysicsSystem.RemovePhyicsObject(gameObject.PhysicsObject);
+        }
+
+        public void Remove(GameObject gameObject)
+        {
+            removalQueue.Add(gameObject);
         }
 
         public void Initialize()
@@ -58,6 +72,21 @@ namespace SoulTrader
             foreach (GameObject obj in scene)
             {
                 obj.Update(gameTime.ElapsedGameTime);
+            }
+
+            if (insertionQueue.Count > 0)
+            {
+                scene.AddRange(insertionQueue);
+                insertionQueue.Clear();
+            }
+
+            if (removalQueue.Count > 0)
+            {
+                foreach (GameObject obj in removalQueue)
+                {
+                    scene.Remove(obj);
+                }
+                removalQueue.Clear();
             }
         }
 

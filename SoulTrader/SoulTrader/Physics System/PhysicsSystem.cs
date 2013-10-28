@@ -24,6 +24,14 @@ namespace SoulTrader
             }
         }
 
+        static public void RemovePhyicsObject(PhysicsObject physicsObject)
+        {
+            if (physicsScene.Contains(physicsObject))
+            {
+                physicsScene.Remove(physicsObject);
+            }
+        }
+
         static public void Update()
         {
             for (int i = 0; i < physicsScene.Count; ++i)

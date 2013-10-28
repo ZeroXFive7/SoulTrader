@@ -10,6 +10,8 @@ namespace SoulTrader
 {
     public class SceneEditor
     {
+        private bool isEnabled = false;
+
         private enum TempObjectState { NONE, DRAGGING };
 
         private TempObjectState state = TempObjectState.NONE;
@@ -44,6 +46,16 @@ namespace SoulTrader
 
         public void Update()
         {
+            if (Input_System.InputSystem.EnableEditor.isPressed())
+            {
+                isEnabled = !isEnabled;
+            }
+
+            if (!isEnabled)
+            {
+                return;
+            }
+
             MouseState mouse = Mouse.GetState();
             if (!InViewport(mouse))
             {
@@ -77,6 +89,11 @@ namespace SoulTrader
 
         public void Render()
         {
+            if (!isEnabled)
+            {
+                return;
+            }
+
             spriteBatch.Begin();
 
             Vector2 ssSelectedVertex = ScreenSpaceVector(selectedVertex);

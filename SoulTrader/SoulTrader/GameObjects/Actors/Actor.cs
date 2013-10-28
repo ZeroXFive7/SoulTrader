@@ -28,19 +28,18 @@ namespace SoulTrader
 
         #region Properties
 
-        private Vector2 spawnPoint;
 
         #endregion
 
         public Actor(string spriteName, Vector2 initialPosition, Vector2 size) 
-            : base(spriteName, initialPosition, size)
-        {
-            spawnPoint = initialPosition;
-        }
+            : base(spriteName, initialPosition, size) { }
 
         public override void Update(TimeSpan timeSinceLastFrame)
         {
+            //UpdatePosition(worldPosition);
+
             float deltaSeconds = (float)timeSinceLastFrame.TotalSeconds;
+  
             if (!onGround)
             {
                 velocity += gravity * deltaSeconds;
@@ -58,62 +57,47 @@ namespace SoulTrader
             base.Update(timeSinceLastFrame);
         }
 
-        public override void HandleCollisions()
+        protected override bool OnGameObjectCollision(GameObject collider)
         {
-            foreach (GameObject collider in Colliders)
+            if (collider is Obstacle)
             {
-                if (collider is KillZone)
+                Obstacle obstacle = collider as Obstacle;
+                switch (CollisionSide(obstacle))
                 {
-                    Respawn();
-                    base.HandleCollisions();
-                    return;
+                    case Side.BOTTOM:
+                        worldPosition.Y = obstacle.TopRightPosition.Y;
+                        if (velocity.Y < 0.0f)
+                        {
+                            velocity.Y = 0.0f;
+                        }
+                        onGround = true;
+                        break;
+                    case Side.LEFT:
+                        worldPosition.X = obstacle.TopRightPosition.X;
+                        if (velocity.X < 0.0f)
+                        {
+                            velocity.X = 0.0f;
+                        }
+                        break;
+                    case Side.RIGHT:
+                        worldPosition.X = obstacle.BottomLeftPosition.X - worldScale.X;
+                        if (velocity.X > 0.0f)
+                        {
+                            velocity.X = 0.0f;
+                        }
+                        break;
+                    case Side.TOP:
+                        worldPosition.Y = obstacle.BottomLeftPosition.Y - worldScale.Y;
+                        if (velocity.Y > 0.0f)
+                        {
+                            velocity.Y = 0.0f;
+                        }
+                        break;
                 }
-                if (collider is Obstacle)
-                {
-                    Obstacle obstacle = collider as Obstacle;
-                    switch (CollisionSide(obstacle))
-                    {
-                        case Side.BOTTOM:
-                            worldPosition.Y = obstacle.TopRightPosition.Y;
-                            if (velocity.Y < 0.0f)
-                            {
-                                velocity.Y = 0.0f;
-                            }
-                            onGround = true;
-                            break;
-                        case Side.LEFT:
-                            worldPosition.X = obstacle.TopRightPosition.X;
-                            if (velocity.X < 0.0f)
-                            {
-                                velocity.X = 0.0f;
-                            }
-                            break;
-                        case Side.RIGHT:
-                            worldPosition.X = obstacle.BottomLeftPosition.X - worldScale.X;
-                            if (velocity.X > 0.0f)
-                            {
-                                velocity.X = 0.0f;
-                            }
-                            break;
-                        case Side.TOP:
-                            worldPosition.Y = obstacle.BottomLeftPosition.Y - worldScale.Y;
-                            if (velocity.Y > 0.0f)
-                            {
-                                velocity.Y = 0.0f;
-                            }
-                            break;
-                    }
-                }
+                return true;
             }
-            UpdatePosition(worldPosition);
-
-            base.HandleCollisions();
-        }
-
-        protected virtual void Respawn()
-        {
-            velocity = Vector2.Zero;
-            UpdatePosition(spawnPoint);
+            
+            return base.OnGameObjectCollision(collider);
         }
 
         protected virtual void UpdatePosition(Vector2 newPosition)

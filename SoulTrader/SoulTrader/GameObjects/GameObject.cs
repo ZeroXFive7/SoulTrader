@@ -54,9 +54,36 @@ namespace SoulTrader
         {
         }
 
-        public virtual void HandleCollisions()
+        public void HandleCollisions()
         {
+            PreCollisionOperation();
+
+            foreach (GameObject collider in Colliders)
+            {
+                if (!OnGameObjectCollision(collider))
+                {
+                    break;
+                }
+            }
+
+            PostCollisionOperation();
+
             Colliders.Clear();
+        }
+
+        protected virtual void PreCollisionOperation()
+        {
+            return;
+        }
+
+        protected virtual void PostCollisionOperation()
+        {
+            return;
+        }
+
+        protected virtual bool OnGameObjectCollision(GameObject collider)
+        {
+            return true;
         }
 
         public virtual void Render()

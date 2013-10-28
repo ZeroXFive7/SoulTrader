@@ -112,22 +112,31 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actor.cs" />
-    <Compile Include="Camera.cs" />
-    <Compile Include="GameObject.cs" />
-    <Compile Include="GameObjectFactory.cs" />
-    <Compile Include="KillZone.cs" />
-    <Compile Include="Scene.cs" />
-    <Compile Include="Obstacle.cs" />
-    <Compile Include="PhysicsObject.cs" />
-    <Compile Include="PhysicsSystem.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="GameObjects\Actors\Actor.cs" />
+    <Compile Include="GameObjects\Actors\Projectiles\MoneyBall.cs" />
+    <Compile Include="GameObjects\Actors\Projectiles\Projectile.cs" />
+    <Compile Include="Graphics System\Camera.cs" />
+    <Compile Include="GameObjects\GameObject.cs" />
+    <Compile Include="GameObjects\GameObjectFactory.cs" />
+    <Compile Include="GameObjects\Actors\Husk.cs" />
+    <Compile Include="Input System\InputAction.cs" />
+    <Compile Include="GameObjects\Obstacles\KillZone.cs" />
+    <Compile Include="Input System\InputSystem.cs" />
+    <Compile Include="SceneSystem\ActiveScene.cs" />
+    <Compile Include="SceneSystem\Scene.cs" />
+    <Compile Include="GameObjects\Obstacles\Obstacle.cs" />
+    <Compile Include="Physics System\PhysicsObject.cs" />
+    <Compile Include="Physics System\PhysicsSystem.cs" />
+    <Compile Include="GameObjects\Actors\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="SceneEditor.cs" />
-    <Compile Include="SoulTrader.cs" />
-    <Compile Include="GraphicsSystem.cs" />
-    <Compile Include="GraphicsObject.cs" />
+    <Compile Include="Main\Program.cs" />
+    <Compile Include="SceneSystem\SceneEditor.cs" />
+    <Compile Include="Souls\DoubleJumpSoul.cs" />
+    <Compile Include="Souls\GroundPoundSoul.cs" />
+    <Compile Include="Souls\Soul.cs" />
+    <Compile Include="Main\SoulTrader.cs" />
+    <Compile Include="Graphics System\GraphicsSystem.cs" />
+    <Compile Include="Graphics System\GraphicsObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

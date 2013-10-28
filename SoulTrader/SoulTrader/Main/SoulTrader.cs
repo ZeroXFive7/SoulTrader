@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using SoulTrader.Input_System;
+using SoulTrader.SceneSystem;
 
 namespace SoulTrader
 {
@@ -19,12 +21,6 @@ namespace SoulTrader
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        SceneEditor editor = null;
-
-        Scene scene = null;
-        Camera mainCamera = null;
-        Player player = null;
-
         public SoulTrader()
         {
             this.Window.AllowUserResizing = true;
@@ -35,10 +31,8 @@ namespace SoulTrader
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-//#if (EDITOR)
-            editor = new SceneEditor();
+            ActiveScene.Editor = new SceneEditor();
             this.IsMouseVisible = true;
-//#endif
         }
 
         /// <summary>
@@ -49,16 +43,16 @@ namespace SoulTrader
         /// </summary>
         protected override void Initialize()
         {
-            mainCamera = new Camera(GraphicsDevice.Viewport);
-            scene = new Scene(mainCamera);
-            scene.Load("Content/Levels/default.lvl");
+            ActiveScene.Camera = new Camera(GraphicsDevice.Viewport);
+            ActiveScene.Scene = new Scene(ActiveScene.Camera);
+            ActiveScene.Scene.Load("Content/Levels/default.lvl");
 
-            if (editor != null)
+            if (ActiveScene.Editor != null)
             {
-                editor.AddNewScene(scene);
+                ActiveScene.Editor.AddNewScene(ActiveScene.Scene);
             }
 
-            player = scene.Player;
+            ActiveScene.Player = ActiveScene.Scene.Player;
 
             base.Initialize();
         }
@@ -71,13 +65,14 @@ namespace SoulTrader
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            InputSystem.Initialize();
             GraphicsSystem.Initialize(spriteBatch, Content);
             PhysicsSystem.Initialize();
-            scene.Initialize();
+            ActiveScene.Scene.Initialize();
 
-            if (editor != null)
+            if (ActiveScene.Editor != null)
             {
-                editor.Initialize(GraphicsDevice, spriteBatch);
+                ActiveScene.Editor.Initialize(GraphicsDevice, spriteBatch);
             }
 
             GraphicsSystem.RegisterSpriteByName("dollar");
@@ -99,19 +94,21 @@ namespace SoulTrader
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (player.Money <= 0 || Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (ActiveScene.Player.Money <= 0 || Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
             {
                 //scene.Save("../../../../SoulTraderContent/Levels/default.lvl");
                 this.Exit();
             }
 
-            if (editor != null)
+            InputSystem.Update();
+
+            if (ActiveScene.Editor != null)
             {
-                editor.Update();
+                ActiveScene.Editor.Update();
             }
 
-            GraphicsSystem.Update(mainCamera.ViewTransform);
-            scene.Update(gameTime);
+            GraphicsSystem.Update(ActiveScene.Camera.ViewTransform);
+            ActiveScene.Scene.Update(gameTime);
             PhysicsSystem.Update();
 
             base.Update(gameTime);
@@ -125,21 +122,31 @@ namespace SoulTrader
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            scene.Render();
+            ActiveScene.Scene.Render();
 
             GraphicsSystem.RenderGraphicsObjects();
 
-            if (editor != null)
+            if (ActiveScene.Editor != null)
             {
-                editor.Render();
+                ActiveScene.Editor.Render();
             }
 
             Viewport viewport = GraphicsDevice.Viewport;
             int offset = viewport.Width / 100;
             int width = viewport.Width / 20;
+            int stringWidth = viewport.Width / 5;
+            int stringHeight = viewport.Height / 10;
 
             GraphicsSystem.RenderUI("dollar", new Rectangle(offset, 2 * offset, width, width));
-            GraphicsSystem.RenderString(player.Money.ToString(), new Vector2(offset + width, 2 * offset));
+            GraphicsSystem.RenderString(ActiveScene.Player.Money.ToString(), new Vector2(offset + width, 2 * offset));
+
+            Vector2 soulPosition = new Vector2(viewport.Width - 2 * stringWidth - offset, 2 * offset);
+            foreach (Soul soul in ActiveScene.Player.Portfolio)
+            {
+                string[] nameParts = soul.ToString().Split('.');
+                GraphicsSystem.RenderString(nameParts[2], soulPosition);
+                soulPosition += new Vector2(0.0f, stringHeight);
+            }
 
             base.Draw(gameTime);
         }
@@ -157,7 +164,7 @@ namespace SoulTrader
             GraphicsDevice.Reset(presentationParams);
 
             GraphicsDevice.Viewport = newViewport;
-            mainCamera.Viewport = newViewport;
+            ActiveScene.Camera.Viewport = newViewport;
         }
     }
 }
