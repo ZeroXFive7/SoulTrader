@@ -3,50 +3,68 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using SoulTrader.Data_Structures;
+using Microsoft.Xna.Framework.Graphics;
+using SoulTrader.GameObjects.Actors.Projectiles;
 
 namespace SoulTrader
 {
     static public class PhysicsSystem
     {
-        static private List<PhysicsObject> physicsScene = new List<PhysicsObject>();
+        static public Vector2 SceneMinCorner = Vector2.Zero;
+        static public Vector2 SceneMaxCorner = Vector2.Zero;
+
+        static private List<PhysicsObject> sceneList = new List<PhysicsObject>();
+        static private QuadTree sceneTree = new QuadTree();
         static private List<GameObject> colliders = new List<GameObject>();
 
         static public void Initialize()
         {
-
+            sceneTree.Initialize(SceneMinCorner, SceneMaxCorner);//new Vector2(0, -100), new Vector2(1000, 1000));
         }
 
         static public void RegisterPhysicsObject(PhysicsObject physicsObject)
         {
-            if (!physicsScene.Contains(physicsObject))
+            if (!sceneList.Contains(physicsObject))
             {
-                physicsScene.Add(physicsObject);
+                sceneList.Add(physicsObject);
+                SceneMinCorner = new Vector2(Math.Min(physicsObject.MinCorner.X, SceneMinCorner.X), Math.Min(physicsObject.MinCorner.Y, SceneMinCorner.Y));
+                SceneMaxCorner = new Vector2(Math.Max(physicsObject.MaxCorner.X, SceneMaxCorner.X), Math.Max(physicsObject.MaxCorner.Y, SceneMaxCorner.Y));
             }
         }
 
         static public void RemovePhyicsObject(PhysicsObject physicsObject)
         {
-            if (physicsScene.Contains(physicsObject))
+            if (sceneList.Contains(physicsObject))
             {
-                physicsScene.Remove(physicsObject);
+                sceneList.Remove(physicsObject);
             }
         }
 
         static public void Update()
         {
-            for (int i = 0; i < physicsScene.Count; ++i)
+            sceneTree.Clear();
+            sceneTree.Initialize(SceneMinCorner, SceneMaxCorner);
+            foreach (PhysicsObject element in sceneList)
             {
-                for (int j = 0; j < physicsScene.Count; ++j)
+                sceneTree.Insert(element);
+            }
+
+            foreach (PhysicsObject element in sceneList)
+            {
+                List<PhysicsObject> potentialColliders = sceneTree.Query(element.MinCorner, element.MaxCorner);
+
+                foreach (PhysicsObject collider in potentialColliders)
                 {
-                    PhysicsObject collider = physicsScene[i];
-                    PhysicsObject collidee = physicsScene[j];
-
-                    if (collider != collidee && collider.BoundingBox.Intersects(collidee.BoundingBox))
+                    if (element != collider && element.Intersects(collider))
                     {
-                        collider.AddCollider(collidee);
-
-                        colliders.Add(collidee.Parent);
+                        element.AddCollider(collider);
                     }
+                }
+
+                if (element.NumColliders > 0)
+                {
+                    colliders.Add(element.Parent);
                 }
             }
 
@@ -56,6 +74,11 @@ namespace SoulTrader
             }
 
             colliders.Clear();
+        }
+
+        static public void Render(GraphicsDevice device, SpriteBatch spriteBatch)
+        {
+            sceneTree.Render(device, spriteBatch);
         }
     }
 }

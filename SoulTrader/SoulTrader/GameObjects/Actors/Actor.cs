@@ -103,7 +103,7 @@ namespace SoulTrader
         protected virtual void UpdatePosition(Vector2 newPosition)
         {
             worldPosition = newPosition;
-            physicsChild.BoundingBox = new BoundingBox(new Vector3(worldPosition, 0.0f), new Vector3(worldPosition + worldScale, 0.0f));
+            physicsChild.Position = worldPosition;
         }
 
         private Side CollisionSide(Obstacle obstacle)

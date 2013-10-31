@@ -152,6 +152,8 @@ namespace SoulTrader
                 soulPosition += new Vector2(0.0f, stringHeight);
             }
 
+            PhysicsSystem.Render(GraphicsDevice, spriteBatch);
+
             base.Draw(gameTime);
         }
 

@@ -112,6 +112,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data Structures\QuadTree.cs" />
     <Compile Include="GameObjects\Actors\Actor.cs" />
     <Compile Include="GameObjects\Actors\Husk.cs" />
     <Compile Include="GameObjects\Actors\Projectiles\MoneyBall.cs" />

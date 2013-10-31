@@ -32,6 +32,8 @@ namespace SoulTrader
 
         #region Collections
 
+        public int NumColliders { get { return Colliders.Count; } } 
+
         protected List<GameObject> Colliders = new List<GameObject>();
 
         #endregion

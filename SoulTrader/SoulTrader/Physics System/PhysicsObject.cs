@@ -8,21 +8,49 @@ namespace SoulTrader
 {
     public class PhysicsObject
     {
+        public int NumColliders { get { return parent.NumColliders; } }
+
+        public Vector2 MinCorner { get { return minCorner; } }
+        public Vector2 MaxCorner { get { return maxCorner; } }
+
+        private Vector2 minCorner;
+        private Vector2 maxCorner;
+
+        public Vector2 Position
+        { 
+            get
+            { 
+                return minCorner; 
+            } 
+            set 
+            { 
+                minCorner = value; 
+                maxCorner = minCorner + Scale; 
+            } 
+        }
+
+        public Vector2 Scale { get { return scale; } set { Scale = value; maxCorner = minCorner + Scale; } }
+        private Vector2 scale;
+
         public GameObject Parent { get { return this.parent; } }
         private GameObject parent;
 
-        private BoundingBox boundingBox;
-        public BoundingBox BoundingBox { get { return boundingBox; } set { boundingBox = value; } }
-
-        public PhysicsObject(GameObject parent, Vector2 lowerLeft, Vector2 size)
+        public PhysicsObject(GameObject parent, Vector2 position, Vector2 size)
         {
             this.parent = parent;
-            boundingBox = new BoundingBox(new Vector3(lowerLeft, 0.0f), new Vector3(lowerLeft + size, 0.0f));
+            this.scale = size;
+            this.Position = position;
         }
 
         public void AddCollider(PhysicsObject collider)
         {
             parent.AddCollider(collider.parent);
+        }
+
+        public bool Intersects(PhysicsObject collider)
+        {
+            return this.minCorner.X < collider.maxCorner.X && this.maxCorner.X > collider.minCorner.X &&
+                   this.minCorner.Y < collider.maxCorner.Y && this.maxCorner.Y > collider.minCorner.Y;
         }
     }
 }
